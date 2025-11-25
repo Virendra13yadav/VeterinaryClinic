@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct HomeView: View {
+    @StateObject private var viewModel: HomeViewModel = HomeViewModel()
+    
     var body: some View {
         VStack {
             Image(systemName: "globe")

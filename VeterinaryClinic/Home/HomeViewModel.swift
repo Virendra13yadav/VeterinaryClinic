@@ -6,3 +6,11 @@
 //
 
 import Foundation
+import SwiftUI
+
+extension HomeView {
+    
+    class HomeViewModel: ObservableObject {
+        
+    }
+}
