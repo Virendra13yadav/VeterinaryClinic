@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject private var router: NavigationRouter
+    @Environment(\.verticalSizeClass) private var vSizeClass
     @StateObject private var viewModel: HomeViewModel = HomeViewModel(service: NetworkService())
     @State private var showAlert = false
     @State private var alertMessage = ""
@@ -16,15 +17,35 @@ struct HomeView: View {
     
     var body: some View {
         ZStack {
-            VStack {
-                ChatCallView
-                WorkingHoursView
-                PetsView
+            if vSizeClass == .compact {
+                HStack(spacing: 16) {
+                    VStack(spacing: 20) {
+                        ChatCallView
+                        WorkingHoursView
+                    }
+                    .frame(maxWidth: 180, alignment: .center)
+                    
+                    Divider()
+                    
+                    PetsView
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                
+            } else {
+                VStack(spacing: 16) {
+                    ChatCallView
+                    WorkingHoursView
+                    Divider()
+                    PetsView
+                }
             }
             
             ShowDetailsToast
         }
         .padding()
+        .ignoresSafeArea(edges: .bottom)
         .onAppear {
             viewModel.getSettings()
             viewModel.getAllPets()
@@ -57,7 +78,6 @@ struct HomeView: View {
                 }
                 
             }
-            .padding(.horizontal)
             .alert("Message", isPresented: $showAlert) {
                 Button("OK", role: .cancel) { }
             } message: {
@@ -73,49 +93,50 @@ struct HomeView: View {
                 .frame(maxWidth: .infinity, maxHeight: 50)
                 .background(Color.gray.opacity(0.1))
                 .border(Color.gray)
-                .padding(.horizontal)
         }
     }
     
     @ViewBuilder
     private var PetsView: some View {
        if let pets = viewModel.pets {
-            List {
+           ScrollView(.vertical, showsIndicators: false) {
                 ForEach(pets) { pet in
-                    HStack(alignment: .top, spacing: 12) {
-
-                        //images loading
-                        AsyncImage(url: pet.imageNSURL) { image in
-                            image.petImageStyle()
-                        } placeholder: {
-                            Image.petPlaceholder
-                                .petImageStyle()
-                        }
-
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(pet.title)
-                                .font(.headline)
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(spacing: 12) {
                             
-                            Text("Date: \(readableDate(from: pet.dateAdded))")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-
-                            //open webview
-                            Button("Content Details") {
-                                if let url = URL(string: pet.contentURL) {
-//                                    router.openWeb(url: url)
-                                } else {
-                                    handleToast()
-                                }
+                            AsyncImage(url: pet.imageNSURL) { image in
+                                image.petImageStyle()
+                            } placeholder: {
+                                Image.petPlaceholder
+                                    .petImageStyle()
                             }
-                            .font(.subheadline)
-                            .foregroundStyle(.blue)
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(pet.title)
+                                    .font(.headline)
+                                
+                                Text("Date: \(readableDate(from: pet.dateAdded))")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+
+                                //open webview
+                                Button("Content Details") {
+                                    if let url = URL(string: pet.contentURL) {
+                                        router.pushWeb(url)
+                                    } else {
+                                        handleToast()
+                                    }
+                                }
+                                .font(.subheadline)
+                                .foregroundStyle(.blue)
+                            }
                         }
+                        
+                        Divider()
                     }
-                    .padding(.vertical, 6)
+
                 }
             }
-            .listStyle(PlainListStyle())
             
         } else {
             Text("No pets loaded yet")
