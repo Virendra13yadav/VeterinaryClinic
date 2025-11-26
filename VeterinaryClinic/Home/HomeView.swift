@@ -18,28 +18,9 @@ struct HomeView: View {
     var body: some View {
         ZStack {
             if vSizeClass == .compact {
-                HStack(spacing: 16) {
-                    VStack(spacing: 20) {
-                        ChatCallView
-                        WorkingHoursView
-                    }
-                    .frame(maxWidth: 180, alignment: .center)
-                    
-                    Divider()
-                    
-                    PetsView
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                
+                CompactView
             } else {
-                VStack(spacing: 16) {
-                    ChatCallView
-                    WorkingHoursView
-                    Divider()
-                    PetsView
-                }
+                PortraitView
             }
             
             ShowDetailsToast
@@ -51,6 +32,34 @@ struct HomeView: View {
             viewModel.getAllPets()
         }
         
+    }
+    
+    @ViewBuilder
+    private var CompactView: some View {
+        HStack(spacing: 16) {
+            VStack(spacing: 20) {
+                ChatCallView
+                WorkingHoursView
+            }
+            .frame(maxWidth: 180, alignment: .center)
+            
+            Divider()
+            
+            PetsView
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+    }
+    
+    @ViewBuilder
+    private var PortraitView: some View {
+        VStack(spacing: 16) {
+            ChatCallView
+            WorkingHoursView
+            Divider()
+            PetsView
+        }
     }
     
     @ViewBuilder
