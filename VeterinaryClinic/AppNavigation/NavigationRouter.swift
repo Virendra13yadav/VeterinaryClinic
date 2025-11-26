@@ -5,7 +5,7 @@
 //  Created by Apple on 26/11/25.
 //
 
-import Foundation
+import SwiftUI
 
 enum APIRouter {
     case settings(id: String)
@@ -18,20 +18,27 @@ enum APIRouter {
     }
 }
 
-final class AppRouter: ObservableObject {
-    @Published var route: Route?
+enum Route: Hashable {
+    case webView(URL)
+}
 
-    enum Route: Identifiable {
-        case webView(URL)
+final class NavigationRouter: ObservableObject {
+    @Published var path: NavigationPath = NavigationPath()
 
-        var id: String {
-            switch self {
-            case .webView(let url): return "\(url.absoluteString)"
-            }
-        }
+    func push(_ route: Route) {
+        path.append(route)
     }
 
-    func openWeb(url: URL) {
-        self.route = .webView(url)
+    func pop() {
+        path.removeLast()
+    }
+
+    func popToRoot() {
+        path.removeLast(path.count)
+    }
+    
+    //webview
+    func pushWeb(_ url: URL) {
+        push(.webView(url))
     }
 }

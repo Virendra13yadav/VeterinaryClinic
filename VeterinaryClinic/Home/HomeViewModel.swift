@@ -14,7 +14,7 @@ extension HomeView {
     class HomeViewModel: ObservableObject {
         
         @Published var settings: Settings?
-        @Published var myPets: [Pet]?
+        @Published var pets: [Pet]?
         @Published var errorMessage: String?
 
         private let service: NetworkServicing
@@ -45,7 +45,7 @@ extension HomeView {
                         self.errorMessage = error.localizedDescription
                     }
                 } receiveValue: { (response: AllPets) in
-                    self.myPets = response.pets
+                    self.pets = response.pets
                 }
                 .store(in: &cancellables)
         }

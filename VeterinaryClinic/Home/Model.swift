@@ -22,14 +22,15 @@ struct AllPets: Codable {
 }
 
 struct Pet: Codable, Identifiable {
+    let id: UUID = UUID()
     let contentURL: String
     let dateAdded: String
-    let id = UUID()
+    let imageURL: String
+    let title: String
+
     var imageNSURL: URL? {
         URL(string: imageURL)
     }
-    let imageURL: String
-    let title: String
 
     enum CodingKeys: String, CodingKey {
         case contentURL = "content_url"
@@ -38,3 +39,4 @@ struct Pet: Codable, Identifiable {
         case title
     }
 }
+

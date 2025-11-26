@@ -9,12 +9,20 @@ import SwiftUI
 
 @main
 struct VeterinaryClinicApp: App {
-    @StateObject private var router = AppRouter()
+    @StateObject private var router = NavigationRouter()
     
     var body: some Scene {
         WindowGroup {
-            HomeView()
-                .environmentObject(router)
+            NavigationStack(path: $router.path) {
+                HomeView()
+                    .navigationDestination(for: Route.self) { route in
+                        switch route {
+                        case .webView(let url):
+                            WebView(url: url)
+                        }
+                    }
+            }
+            .environmentObject(router)
         }
     }
 }

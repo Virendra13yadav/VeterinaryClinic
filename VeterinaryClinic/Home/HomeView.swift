@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HomeView: View {
-    @EnvironmentObject private var router: AppRouter
+    @EnvironmentObject private var router: NavigationRouter
     @StateObject private var viewModel: HomeViewModel = HomeViewModel(service: NetworkService())
     @State private var showAlert = false
     @State private var alertMessage = ""
@@ -24,6 +24,7 @@ struct HomeView: View {
             
             ShowDetailsToast
         }
+        .padding()
         .onAppear {
             viewModel.getSettings()
             viewModel.getAllPets()
@@ -78,7 +79,7 @@ struct HomeView: View {
     
     @ViewBuilder
     private var PetsView: some View {
-        if let pets = viewModel.myPets {
+       if let pets = viewModel.pets {
             List {
                 ForEach(pets) { pet in
                     HStack(alignment: .top, spacing: 12) {
@@ -94,15 +95,15 @@ struct HomeView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(pet.title)
                                 .font(.headline)
-
-                            Text("Added: \(pet.dateAdded)")
+                            
+                            Text("Date: \(readableDate(from: pet.dateAdded))")
                                 .font(.caption)
                                 .foregroundColor(.gray)
 
                             //open webview
-                            Button("Open Details") {
+                            Button("Content Details") {
                                 if let url = URL(string: pet.contentURL) {
-                                    router.openWeb(url: url)
+//                                    router.openWeb(url: url)
                                 } else {
                                     handleToast()
                                 }
@@ -127,7 +128,7 @@ struct HomeView: View {
         if showToast {
             VStack {
                 Spacer()
-                ToastView(message: "Detials URL not found!")
+                ToastView(message: "Details are currently not available.")
                     .padding(.bottom, 40)
             }
             .animation(.easeInOut, value: showToast)
@@ -150,6 +151,22 @@ struct HomeView: View {
         }
         showAlert = true
     }
+    
+    private func readableDate(from isoString: String) -> String {
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+        let displayFormatter = DateFormatter()
+        displayFormatter.dateStyle = .medium
+        displayFormatter.timeStyle = .short
+
+        if let date = isoFormatter.date(from: isoString) {
+            return displayFormatter.string(from: date)
+        } else {
+            return "Invalid Date"
+        }
+    }
+
 }
 
 #Preview {
